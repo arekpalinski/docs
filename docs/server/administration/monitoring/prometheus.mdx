@@ -27,6 +27,7 @@ import LanguageContent from "@site/src/components/LanguageContent";
    * [RavenDB Prometheus Endpoint](../../../server/administration/monitoring/prometheus.mdx#ravendb-prometheus-endpoint)  
        * [Omit or Include Selected Metrics](../../../server/administration/monitoring/prometheus.mdx#omit-or-include-selected-metrics)  
        * [Metrics Provided by the Prometheus Endpoint](../../../server/administration/monitoring/prometheus.mdx#metrics-provided-by-the-prometheus-endpoint)  
+           * [GC Metrics](../../../server/administration/monitoring/prometheus.mdx#gc-metrics)  
    * [Using the RavenDB Endpoint by a Prometheus Server](../../../server/administration/monitoring/prometheus.mdx#using-the-ravendb-endpoint-by-a-prometheus-server)  
        * [Fetching Additional RavenDB Information](../../../server/administration/monitoring/prometheus.mdx#fetching-additional-ravendb-information)  
 
@@ -66,6 +67,15 @@ E.g., to skip indexing metrics use -
 http://localhost:8080/admin/monitoring/v1/prometheus?skipIndexesMetrics=true
 And to skip both indexing and server metrics use -  
 http://localhost:8080/admin/monitoring/v1/prometheus?skipIndexesMetrics=true&skipServerMetrics=true
+
+Some metrics are **not included by default** and must be explicitly requested using opt-in query parameters:  
+
+| Parameter | Default | Description |
+| - | - | - |
+| `includeGcMetrics` | `false` | Set to `true` to include [GC metrics](../../../server/administration/monitoring/prometheus.mdx#gc-metrics) in the response. |
+
+E.g., to include GC metrics use -  
+http://localhost:8080/admin/monitoring/v1/prometheus?includeGcMetrics=true
 
 ## Metrics Provided by the Prometheus Endpoint
 
@@ -172,6 +182,30 @@ Here is the list of metrics made available by the `/admin/monitoring/v1/promethe
 | server_storage_total_free_space_bytes | Remaining storage disk space |
 | server_storage_write_throughput_bytes | Disk Write Throughput |
 | server_uptime_seconds | Server up-time |
+
+### GC Metrics
+
+GC metrics are included in the Prometheus output only when the `includeGcMetrics=true` query parameter is set.  
+All GC metrics carry a `gckind` label (currently always `any`).
+
+| Metric | Description |
+| - | - |
+| gc_compacted | Whether the last garbage collection was compacting (`1` = true, `0` = false) |
+| gc_concurrent | Whether the last garbage collection was concurrent (`1` = true, `0` = false) |
+| gc_finalization_pending_count | Number of objects pending finalization observed during the last garbage collection |
+| gc_fragmented_mb | Heap fragmentation in MB after the last garbage collection |
+| gc_generation | Generation collected by the last garbage collection |
+| gc_heap_size_mb | Total GC heap size in MB after the last garbage collection |
+| gc_high_memory_load_threshold_mb | High memory load threshold in MB at the time of the last garbage collection |
+| gc_index | Index of the last garbage collection |
+| gc_memory_load_mb | Memory load in MB at the time of the last garbage collection |
+| gc_pause_durations1_seconds | First GC pause duration in seconds recorded during the last garbage collection |
+| gc_pause_durations2_seconds | Second GC pause duration in seconds recorded during the last garbage collection |
+| gc_pause_time_percentage | Percentage of time spent paused for GC since the previous collection |
+| gc_pinned_objects_count | Number of pinned objects observed during the last garbage collection |
+| gc_promoted_mb | Memory promoted during the last garbage collection in MB |
+| gc_total_available_memory_mb | Total available memory for the GC in MB at the time of the last garbage collection |
+| gc_total_committed_mb | Total committed managed heap size in MB after the last garbage collection |
 
 
 
